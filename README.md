@@ -2992,6 +2992,9 @@ public static void insertSort(int[] arr){
 
 * **基数排序**(radix sort) 属于”分配式排序“ (distribution sort)，又称“桶子法”(bucket sort) 或 bin sort，顾名思义，它是通过键值的各个位的值，**将要排序的元素分配至某些“桶”中，达到排序的作用**
 * 基数排序是桶排序的扩展
+* 基数排序是**稳定**的
+
+**稳定：**假定在待排序的记录序列中，存在多个具有相同的关键字的记录，若经过排序，这些记录的相对次序保持不变，即在原序列中：r[i] = r[j]，且r[i] 在 r[j]之前，而在排序后的序列中，r[i] 仍在 r[j]之前，<font color="red">**则称这种排序算法是稳定的；否则称为不稳定的**</font>
 
 #### 基本思想
 
@@ -3008,6 +3011,8 @@ int[] xxx = new int[10]，
 总共排序的轮数是数组中最大数字的位数。
 
 #### 案例：对数组{542,53,3,14,214,748}排序
+
+<font color="red">排序的轮数是最大的数字的位数，比如这里是748，最高位是百位，所以排3轮</font>
 
 **第一轮排序**：
 
@@ -3038,3 +3043,254 @@ int[] xxx = new int[10]，
 2. 按照这个桶的顺序（一维数组的下标）依次取出数据，放入到原来的数组
 
 ![](http://124.222.43.240:2334/upload/2022-7-10$99596ytSJr.png)
+
+#### 基数排序的缺点
+
+1. 使用空间换时间，**空间复杂度非常大**，占用内存很大，数据量大的时候，可能会爆内存：OutOfMemoryError
+2. 有负数的数组，我们不用基数排序来进行排序，如果要支持负数，要对代码进行改进：
+   * 对这个值取绝对值，因为取位算法除法取模出来的会是一个负数
+   * 从桶里拿到这个值取出的时候要进行反转，因为已经取了绝对值的
+
+#### 代码实现
+
+将{53, 3, 542, 748, 14, 214} 使用基数排序进行升序排序。
+
+~~~java
+ //基数排序
+    public static void redixSort(int[] arr) {
+        //根据推导过程，得到最终基数排序的代码
+        //定义一个二维数组，表示10个桶，每个桶就是一个一维数组
+        /*
+        说明：
+        1. 二维数组包含10个一维数组，表示每一位的范围0~9，所以需要10个
+        2. 为了防止在放入数的时候，数据溢出，则每一个一维数组（桶），大小定为arr.length
+        3. 很明确，基数排序是使用空间换时间的经典算法
+         */
+        int[][] bucket = new int[10][arr.length];
+
+        //为了记录每个桶中实际存放了多少个数据，我们定义一个一维数组来记录各个桶每次放入的数据个数
+        //可以这样理解：
+        // bucketElementCounts[0] 记录的就是 bucket[0] 桶中 已经放入的数据的个数
+        int[] bucketElementCounts = new int[10];
+
+        //1. 得到数组中最大的数的位数
+        int max = arr[0]; //假设第一个数就是最大的数
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] > max) {
+                max = arr[i];
+            }
+        }
+        //得到最大数是几位数
+        int maxLength = (max + "").length();
+        //数据要从桶中放入数组时数组的下标
+        int index = 0;
+
+        //这里我们使用循环将代码处理一下
+        for (int i = 0, n = 1; i < maxLength; i++, n *= 10) {
+            //针对每个元素对应的位进行排序，第一次是个位，第二次是十位，第三次是百位.....
+            for (int j = 0; j < arr.length; j++) {
+                //取出每个元素的对应的位的数
+                int digitOfElement = (arr[j] / n) % 10;
+                //放入到对应的桶中
+                bucket[digitOfElement][bucketElementCounts[digitOfElement]] = arr[j];
+                bucketElementCounts[digitOfElement]++;
+            }
+            //按照这个桶的顺序（一维数组的下标）依次取出数据，放入到原来的数组
+            index = 0;
+            //遍历每一个桶，并将桶中的数据放入到原数组中
+            for (int k = 0; k < bucketElementCounts.length; k++) {
+                //如果桶中有数据，我们才放入到原数组
+                if (bucketElementCounts[k] != 0) {
+                    //循环第k个桶（第k个一维数组），放入
+                    for (int l = 0; l < bucketElementCounts[k]; l++) {
+                        //取出元素放入到arr中
+                        arr[index] = bucket[k][l];
+                        index++;
+                    }
+                }
+                //第i+1轮处理后，需要将每个bucketElementCounts[k] = 0 !!!
+                bucketElementCounts[k] = 0;
+            }
+          System.out.println("第"+ (i+1) +"轮 arr =" + Arrays.toString(arr));
+        }
+    }
+~~~
+
+ ### 常用排序算法总结和对比
+
+![](http://124.222.43.240:2334/upload/2022-7-10$78425rdwnQ.png)
+
+
+
+### 查找算法
+
+在Java中，常用的查找算法有4种：
+
+1. 顺序（线性）查找
+2. 二分（折半）查找
+3. 插值插值
+4. 斐波那契查找（黄金分割点查找）
+
+### 线性查找算法
+
+线性查找就是顺序查找，就是在数组中找到一个值，找到了就返回下标，没找到返回-1，没啥好说的233
+
+#### 代码实现
+
+~~~java
+/*
+     这里我们实现的线性查找是找到一个满足条件的值就返回
+     */
+    public static int linearSearch(int[] arr,int value){
+        //线性查找是逐一比对，发现有相同值，就返回下标
+        for(int i=0;i<arr.length;i++){
+            if(arr[i] == value){
+                return i;
+            }
+        }
+        return -1;
+    }
+~~~
+
+### 二分查找算法
+
+重要：二分查找只能在 **有序数组** 中才能使用，所以使用前需要先 **排序**！！！！
+
+#### 二分查找的思路分析
+
+(对升序数组进行分析)
+
+1. 首先确定该数组的中间的下标
+
+~~~java
+mid = (left + right) / 2
+~~~
+
+2. 然后让需要查找的数findVal 和 arr[mid] 比较
+
+* 如果 findVal > arr[mid]，说明你要查找的数在 mid 的右边，因此需要向右查找。
+* 如果 findVal < arr[mid]，说明你要查找的数在 mid 的左边，因此需要向左查找。
+* findVal == arr[mid]，说明找到，直接返回。
+
+示意图（递归版）：
+
+非递归的版本这视频暂时没看到，后面看看他讲不讲，不讲就离谱了
+
+![](http://124.222.43.240:2334/upload/2022-7-10$224866fxAb.png)
+
+#### 二分查找的写法
+
+1. 递归法
+
+* 对于递归法的注意事项：
+
+  什么时候我们需要结束递归？
+
+  1. 找到就结束递归
+  2. 递归完整个数组，仍然没有找到findVal，也需要结束递归 -- 当 left > right 就需要退出
+
+ ##### 代码实现（递归法）
+
+~~~java
+    //二分查找算法（递归版本）
+    //注意，使用二分查找的前提是要操作的数组必须有序
+
+    //这里的代码和视频里原版不一样！！！他视频里最后没有return，在我的IDE里会报错说没有返回类型！！
+    //所以我被迫用void来改装了一个
+
+    /**
+     *
+     * @param arr 数组
+     * @param left 左边的索引
+     * @param right 右边的索引
+     * @param findVal 要查找的值
+     * 如果找到就输出下标，如果没有找到，就输出-1
+     */
+    public static void binarySearch(int[] arr,int left,int right,int findVal){
+        // 当left > right 时，说明递归整个数组，但是没有找到
+        if(left > right){
+            System.out.println(-1);
+            throw new RuntimeException("没有找到该值！");
+        }
+        int mid = (left + right) / 2;
+        int midVal = arr[mid];
+
+        if(findVal > midVal){ //向右递归
+            binarySearch(arr,mid + 1,right,findVal);
+        } else if(findVal < midVal){//向左递归
+            binarySearch(arr,left,mid - 1,findVal);
+        } else{
+            System.out.println(mid);
+        }
+    }
+~~~
+
+
+
+##### 循环（非递归）法
+
+使用while循环来代替递归，并进行优化：当一个有序数组中有多个相同数值时，如何将所有的数值都查找到。**（咱们用这个，递归咱尽量不用233）**
+
+<font color="red">**注意！以下这段代码视频里面没有！我做了视频中的优化，但是我使用的不是递归而是while循环！！！**</font>
+
+~~~java
+//二分查找算法（循环版本）
+ //注意，使用二分查找的前提是要操作的数组必须有序
+    //注意，这段代码也和视频中不一样，因为我是用while循环来做的，而不是递归
+
+    /*
+    举例说明： {1, 8, 10, 89, 1000,1000,1000,1234}
+    优化：当一个有序数组中有多个相同数值时，如何将所有的数值都查找到，比如这里的1000
+    优化思路分析：
+    1. 在找到 mid 值后，不要马上返回
+    2. 向 mid 索引值的左边扫描，将所有值等于 1000 的元素的下标，加入到集合ArrayList
+    3. 向 mid 索引值的右边扫描，将所有值等于 1000 的元素的下标，加入到集合ArrayList
+     */
+public static List<Integer> binarySearch2(int[] arr, int findVal){
+        List<Integer> resultIndexList = new ArrayList<>();
+        int left = 0;
+        int right = arr.length - 1;
+        int mid = 0;
+        while(left <= right){
+            mid = (left + right) / 2;
+            if(findVal == arr[mid]){
+                //findVal == arr[mid]  找到了
+                //向 mid 索引值的左边扫描，将所有值等于 要查找的那个元素 的下标，加入到集合ArrayList
+                int temp = mid - 1;
+                while(true){
+                    if(temp < 0){//退出
+                        break;
+                    }
+                    //否则，如果temp的值等于findVal, 就将 temp 放入到resIndexList
+                    if(arr[temp] == findVal){
+                        resultIndexList.add(temp);
+                    }
+                    temp--; //temp左移
+                }
+                resultIndexList.add(mid);
+
+                //向 mid 索引值的右边扫描，将所有值等于 要查找的那个元素 的下标，加入到集合ArrayList
+                temp = mid + 1;
+                while(true){
+                    if(temp > arr.length - 1){//退出
+                        break;
+                    }
+                    //否则，如果temp的值等于findVal, 就将 temp 放入到resIndexList
+                    if(arr[temp] == findVal){
+                        resultIndexList.add(temp);
+                    }
+                    temp++; //temp右移
+                }
+                break; //这个break很重要！！！一定不要忘记！！不然就是死循环！！ 找到了一定要退出！！不然就一直搁那添加同一个值到ArrayList!!!
+            }
+            else if(findVal < arr[mid]){
+                right = mid - 1;
+            }
+            else{
+                left = mid + 1;
+            }
+        }
+        return resultIndexList;
+    }
+~~~
+
