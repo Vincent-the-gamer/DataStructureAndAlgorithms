@@ -3294,3 +3294,250 @@ public static List<Integer> binarySearch2(int[] arr, int findVal){
     }
 ~~~
 
+
+
+### 插值查找
+
+* 使用条件：需要数组有序
+
+1. 插值查找算法类似于二分查找，不同的是插值查找每次从**自适应mid**处开始查找。
+
+2. 将折半查找中的求mid索引的公式改为如下公式，low表示左边索引，high表示右边索引
+   $$
+   mid = \frac{low+high}{2} = low + \frac{1}{2}(high - low)
+   $$
+   
+
+   改成：
+   $$
+   mid = low + \frac{key-a[low]}{a[high]-a[low]}(high-low)
+   $$
+   key 就是前面的findVal，也就是要查找的值
+
+3. ~~~java
+   //插值索引
+   int mid = low + (high - low) * (key - arr[low]) / (arr[high] - arr[low]);
+   ~~~
+
+​       对应前面的代码，公式就变成了：
+
+      ~~~java
+      int mid = left + (right - left) * (findVal - arr[left]) / (arr[right] - arr[left])
+      ~~~
+
+4. 举例说明插值查找算法 1 - 100的数组
+
+#### 插值查找算法的一个举例说明
+
+数组 arr = {1,2,3, ..... , 100}
+
+假如我们需要查找的值是 1，使用二分查找的话，需要多次递归或者是while循环，才能找到1
+
+因为mid = (left + right) / 2
+
+如果使用插值查找算法找这个1：
+
+~~~java
+    mid = left + (right - left) * (findVal - arr[left]) / (arr[right] - arr[left])
+        = 0 + (99 - 0) * (1 - 1) / (100 - 1) 
+        = 0 + 99 * 0 / 99 
+        = 0
+~~~
+
+会发现mid直接就定位到arr[0]了
+
+
+
+如果我们查找100
+
+~~~java
+    mid = left + (right - left) * (findVal - arr[left]) / (arr[right] - arr[left])
+        = 0 + (99 - 0) * (100 - 1) / (100 - 1) 
+        = 0 + 99 * 99 / 99 
+        = 99
+~~~
+
+也是直接就定位到arr[99]了
+
+
+
+#### 插值查找的注意事项
+
+1. 对于数据量较大，**关键字分布比较均匀**的查找表来说，采用**插值查找，速度较快**
+2. **关键字分布不均匀**的情况下，该方法不一定比二分查找（折半查找）要好。
+
+
+
+#### 代码实现
+
+~~~java
+    //编写插值查找算法
+    //这段代码也和视频中不同，是用while循环做的，因为插值查找就是二分查找把mid的算法改了一下，其他不动
+    /**
+     *
+     * @param arr 待查找的数组
+     * @param findVal 要查找的值
+     * @return 如果找到，就返回对应的下标，如果没有找到，就返回-1
+     */
+    public static int insertValueSearch(int[] arr,int findVal){
+        int left = 0; //左边索引
+        int right = arr.length - 1; //右边索引
+        int mid; //要查找的中间索引
+        int midVal; //中间索引的值
+
+        int result = -1; //结果，如果没找到默认等于-1
+        while(left <= right){
+            if(findVal > arr[arr.length - 1] || findVal < arr[0]){
+                //如果要查找的值比数组最小的还小，或者比最大的还大，肯定就找不到了
+                return result;
+            }
+            //自适应mid计算法
+            mid = left + (right - left) * (findVal - arr[left]) / (arr[right] - arr[left]);
+            midVal = arr[mid];
+            if(findVal > midVal){
+                left = mid + 1;
+            }
+            else if(findVal < midVal){
+                right = mid - 1;
+            }
+            else{
+                result = mid;
+                break;
+            }
+        }
+        return result;
+    }
+~~~
+
+
+
+### 斐波那契查找算法（黄金分割法）
+
+* 使用条件：需要数组有序
+
+1. 黄金分割点是指把一条线段分割为两部分，使其中一部分与全长之比等于另一部分与这部分之比，比值是
+
+   $\frac{\sqrt{5}-1}{2}$, 取其小数点后前三位的值是0.618。 由于使用此比例设计的造型十分美丽，因此成为**黄金分割**，也称为**中外比。**
+
+2. 斐波那契数列{1, 1, 2, 3, 5, 8, 13, 21, 34, 55, ...} ，我们可以发现斐波那契数列的两个相邻数的比例(前一个值比上后一个值)，无限接近黄金分割值0.618
+
+#### 斐波那契查找原理
+
+和二分查找，插值查找类似，仅仅改变了中间节点mid的位置，mid不再是中间或者插值得到，而是位于黄金分割点附近：
+
+~~~java
+mid = low + F(k-1) -1  // 其中，F代表斐波那契数列
+~~~
+
+如下图所示：
+
+![](http://124.222.43.240:2334/upload/2022-7-11$13614BKXGJ.png)
+
+**对 F(k-1) -1 的理解**
+
+1. 由斐波那契数列 F[k] = F[k-1] + F[k-2] 的性质，可以得到( F[k] - 1 ) = ( F[k-1] - 1)  +  ( F[k-2] - 1)   + 1
+
+该式说明：只要顺序表的长度为F[k] - 1，则可以将该表分成长度为 F[k-1] -1和 F[k-2] - 1的两段，
+
+所以中间位置为mid = low + F(k-1) -1
+
+2. 类似的，每一子段也可以用相同的方式分割。
+
+3. 但顺序表长度 n 不一定刚好等于F [k] -1， 所以需要将原来的顺序表长度 n 增加至 F [k] -1。这里的 k 值只要能使得 F[k] - 1恰好大于或等于n即可，由以下代码得到，顺序表长度增加后，新增的位置（从n + 1到 F[k] - 1位置），都赋值为n位置的值即可
+
+   ~~~java
+   while(n > fib(k) - 1){  //fib(k)也就是F(k)
+     k++;
+   }
+   ~~~
+
+   
+
+#### 斐波那契查找案例
+
+对 {1, 8, 10, 89, 1000, 1234} 进行查找
+
+#### 代码实现
+
+~~~java
+    //因为mid = low + F(k-1) -1 需要用到斐波那契数列，所以需要先获取到一个斐波那契数列
+    //用非递归的方式得到一个长度为len的斐波那契数列
+    public static int[] fib(int len){
+        int[] f = new int[len];
+        f[0] = 1;
+        f[1] = 1;
+        for(int i = 2; i < len; i++){
+            f[i] = f[i-1] + f[i-2];
+        }
+        return f;
+    }
+
+    //斐波那契查找算法（非递归）
+    /**
+     *
+     * @param a  数组
+     * @param key 我们需要查找的关键码(值)
+     * @return 返回对应的下标，如果没有，返回-1
+     */
+    public static int fibSearch(int[] a,int key){
+        int low = 0;
+        int high = a.length - 1;
+        int k = 0; //表示斐波那契分割数值的下标 也就是 F(k-1) 中的 k
+        int mid = 0; //存放mid值
+        int[] f = fib(a.length); //获取到斐波那契数列
+
+        //获取到斐波那契分割数值的下标
+        while(high > f[k] - 1){
+            k++;
+        }
+        // 因为 f[k] 值 可能大于 a 的长度，因此我们需要使用Arrays类，构造一个新的数组，并指向a
+        // 不足的部分会使用0填充
+        int[] temp = Arrays.copyOf(a, f[k]);
+        // 实际上需要使用 a 数组的最后的数填充 temp
+        for(int i = high + 1; i < temp.length; i++){
+            temp[i] = a[high];
+        }
+
+        //使用while来循环处理，找到我们的数key
+        while(low <= key){ //只要满足就一直找
+            //如果下标越界, 表示没找到，直接break
+            if(k - 1 < 0 || k - 1 > a.length){
+                break;
+            }
+            mid = low + f[k-1] - 1;
+            if(key < temp[mid]){ //我们应该继续向数组的前面（左边）查找
+                high = mid - 1;
+                //为什么是k--?
+                //说明：
+                //1. 全部元素 = 前面的元素 + 后面的元素
+                //2. f[k] = f[k-1] + f[k-2]
+                //因为 前面有 f[k-1]个元素，所以可以继续拆分 f[k-1] = f[k-2] + f[k-3]
+                //即在 f[k-1]的前面继续查找， 下次循环mid = low + f[k-1-1]-1
+                k--;
+            }
+            else if( key > temp[mid] ){ //我们应该继续向数组的后面（右边）查找
+                low = mid + 1;
+                /*
+                为什么是k -= 2?
+                说明：
+                1. 全部元素 = 前面的元素 + 后面的元素
+                2. f[k] = f[k-1] + f[k-2]
+                3. 因为后面有f[k-2]个元素，所以可以继续拆分 f[k-2] = f[k-3] + f[k-4]
+                4. 即在f[k-2] 的后面继续查找, 即下次循环mid = low + f[k - 1 - 2] - 1;
+                 */
+                k -= 2;
+            }
+            else{ //找到
+                //需要确定返回的是哪个下标
+                if(mid <= high){
+                   return mid;
+                }
+                else if(mid >= low){
+                   return high;
+                }
+            }
+        }
+        return -1;
+    }
+~~~
+
