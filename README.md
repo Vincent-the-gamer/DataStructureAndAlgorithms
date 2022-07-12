@@ -2381,6 +2381,579 @@ class EmpLinkedList {
 
 ​       
 
+###  二叉树
+
+ #### 树的示意图和常用术语
+
+![](http://124.222.43.240:2334/upload/2022-7-12$47571mEAkp.jpg)
+
+#### 二叉树的概念
+
+1. 树有很多种，每个节点**最多只能有两个子节点**的一种形式称为二叉树。
+
+2. 二叉树的子节点分为左节点和右节点，一般叫左孩子和右孩子。
+
+   ![](http://124.222.43.240:2334/upload/2022-7-12$82999an6S2.jpg)
+
+3. **满二叉树**：如果该二叉树的**所有叶子节点**都在最后一层，并且**节点总数**=$2^n-1$, n为层数，则我们称为**满二叉树**，  **ps: 也就是说每一个节点都有左孩子和右孩子**。
+
+   ![](http://124.222.43.240:2334/upload/2022-7-12$32141mwBQX.jpg)
+
+   
+
+4. **完全二叉树：**如果该二叉树的所有叶子节点都在最后一层或者倒数第二层，而且最后一层的叶子节点在左边连续，倒数第二层的叶子节点在右边连续，我们就把它叫做**完全二叉树**。
+
+   **我们可以更为简单的理解为：对于一些节点，我们按照二叉树的排列规则，从左到右的依次向下排列，中间不能有空位，就叫完全二叉树**。
+
+   ![](http://124.222.43.240:2334/upload/2022-7-12$705287TbDw.jpg)
+
+
+
+
+#### 二叉树的遍历（递归法,  不会的去算法里面看看递归）
+
+二叉树的遍历方式：前序，中序，后序。
+
+**记的时候记前根序，中根序，后根序比较好，我是觉得这些概念的命名有时候整得你一愣一愣的。**
+
+* 前序（前根序）：**根** 左 右
+
+* 中序（中根序）： 左 **根** 右
+
+* 后序（后根序）：左 右 **根**
+
+这么说明白了吧，而且很容易记，就这前序啥啥啥的整得你一愣一愣的，还容易忘，就离谱
+
+
+
+
+
+**我们来看看一般教材或者网络资料的概念是咋说的：**
+
+* 前序遍历：**先输出父节点**，再遍历左子树和右子树。
+
+* 中序遍历：先遍历左子树，**再输出父节点**，再遍历右子树。
+
+* 后序遍历：先遍历左子树，再遍历右子树，**最后输出父节点**。
+
+你们说说哪个好记？
+
+
+
+#### 二叉树遍历的简单案例
+
+![](http://124.222.43.240:2334/upload/2022-7-12$20919cKdwZ.png)
+
+#### 简单案例的代码实现
+
+代码实现中，增加了一个节点，参考下图
+
+![](http://124.222.43.240:2334/upload/2022-7-12$7988842YWE.png)
+
+~~~java
+//测试部分
+public static void main(String[] args) {
+        //先需要创建一棵二叉树
+        BinaryTree binaryTree = new BinaryTree();
+        //创建需要的节点
+        HeroNode root = new HeroNode(1,"蕾姆");
+        HeroNode node2 = new HeroNode(2,"蒂法");
+        HeroNode node3 = new HeroNode(3,"爱丽丝");
+        HeroNode node4 = new HeroNode(4,"玛丽萝丝");
+        HeroNode node5 = new HeroNode(5,"雏鹤爱");
+
+        //说明：我们先手动创建该二叉树，后面学习以递归的方式创建二叉树
+        root.setLeft(node2);
+        root.setRight(node3);
+        node3.setRight(node4);
+        node3.setLeft(node5);
+        binaryTree.setRoot(root);
+
+        //测试前序遍历
+        System.out.println("前序遍历"); //1 2 3 5 4
+        binaryTree.frontOrder();
+
+        //测试中序遍历
+        System.out.println("中序遍历"); //2 1 5 3 4
+        binaryTree.midOrder();
+
+        //测试后序遍历
+        System.out.println("后序遍历"); //2 5 4 3 1
+        binaryTree.backOrder();
+}
+
+//先创建HeroNode 节点
+class HeroNode{
+    private int no;
+    private String name;
+    private HeroNode left;  //默认null
+    private HeroNode right;  //默认null
+
+    public HeroNode(int no, String name) {
+        this.no = no;
+        this.name = name;
+    }
+
+    public int getNo() {
+        return no;
+    }
+
+    public void setNo(int no) {
+        this.no = no;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public HeroNode getLeft() {
+        return left;
+    }
+
+    public void setLeft(HeroNode left) {
+        this.left = left;
+    }
+
+    public HeroNode getRight() {
+        return right;
+    }
+
+    public void setRight(HeroNode right) {
+        this.right = right;
+    }
+
+    @Override
+    public String toString() {
+        return "no= " + no + ", name= " + name;
+    }
+
+    //编写前根序遍历的方法: 根 左 右
+    public void frontOrder(){
+        System.out.println(this); //先输出根节点（父节点）
+        //递归向左子树前根序遍历
+        if(this.left != null){
+            this.left.frontOrder(); //递归
+        }
+        //递归向右子树前序遍历
+        if(this.right != null){
+            this.right.frontOrder();//递归
+        }
+    }
+
+    //编写中根序遍历的方法: 左 根 右
+    public void midOrder(){
+        //递归向左子树中序遍历
+        if (this.left != null){
+            this.left.midOrder();
+        }
+        //输出根节点
+        System.out.println(this);
+        //递归向右子树中序遍历
+        if(this.right != null){
+            this.right.midOrder();
+        }
+    }
+
+    //编写后根序遍历的方法: 左 右 根
+    public void backOrder(){
+        //递归向左子树后序遍历
+        if (this.left != null){
+            this.left.backOrder();
+        }
+        //递归向右子树后序遍历
+        if(this.right != null){
+            this.right.backOrder();
+        }
+        //输出根节点
+        System.out.println(this);
+    }
+
+}
+
+//定义一个二叉树：BinaryTree
+class BinaryTree {
+    private HeroNode root; //根节点
+
+    public void setRoot(HeroNode root) {
+        this.root = root;
+    }
+
+    //前序遍历
+    public void frontOrder(){
+        if(this.root != null){
+            this.root.frontOrder();
+        }
+        else{
+            System.out.println("二叉树为空，无法前序遍历！");
+        }
+    }
+
+    //中序遍历
+    public void midOrder(){
+        if(this.root != null){
+            this.root.midOrder();
+        }
+        else{
+            System.out.println("二叉树为空，无法中序遍历！");
+        }
+    }
+
+    //后序遍历
+    public void backOrder(){
+        if(this.root != null){
+            this.root.backOrder();
+        }
+        else{
+            System.out.println("二叉树为空，无法后序遍历！");
+        }
+    }
+~~~
+
+
+
+#### 二叉树 --- 查找指定的节点
+
+用前序，中序，后序查找：根据**节点编号**查找节点。
+
+还是使用下图这个案例
+
+![](http://124.222.43.240:2334/upload/2022-7-12$7988842YWE.png)
+
+##### 前序查找思路
+
+1. 先判断当前节点的no（编号）是否等于要查找的
+2. 如果相等，直接返回当前节点
+3. 如果不等，则判断当前节点的左子节点是否为空，如果不为空，则递归前序查找
+4. 如果左递归前序查找找到了节点，就返回，否则继续判断当前节点的右子节点是否为空，如果不为空则继续向右递归前序查找
+
+##### 中序查找思路
+
+1. 先判断当前节点的左子节点是否为空，如果不为空，则递归中序查找
+2. 如果找到，则返回，如果没有找到，就和当前节点比较，如果是则返回当前节点，否则继续进行右递归的中序查找
+3. 如果右递归中序查找，找到就返回，否则返回null
+
+##### 后序查找思路
+
+1. 先判断当前节点的左子节点是否为空，如果不为空，则递归后序查找
+2. 如果找到了，就返回，如果没有找到就判断当前节点的右子节点是否为空，如果不为空则右递归后序查找，如果找到，就返回。
+3. 否则，就和当前节点进行比较，如果是则返回，否则返回null
+
+##### 代码实现
+
+~~~java
+package tree;
+
+//二叉树
+public class BinaryTreeDemo {
+    public static void main(String[] args) {
+        //先需要创建一棵二叉树
+        BinaryTree binaryTree = new BinaryTree();
+        //创建需要的节点
+        HeroNode root = new HeroNode(1, "蕾姆");
+        HeroNode node2 = new HeroNode(2, "蒂法");
+        HeroNode node3 = new HeroNode(3, "爱丽丝");
+        HeroNode node4 = new HeroNode(4, "玛丽萝丝");
+        HeroNode node5 = new HeroNode(5, "雏鹤爱");
+
+        //说明：我们先手动创建该二叉树，后面学习以递归的方式创建二叉树
+        root.setLeft(node2);
+        root.setRight(node3);
+        node3.setRight(node4);
+        node3.setLeft(node5);
+        binaryTree.setRoot(root);
+
+        // 前序遍历查找
+//        System.out.println("前序遍历查找：");
+//        int no = 5;
+//        System.out.println("正在查找编号为："+ no + " 的节点");
+//        HeroNode node = binaryTree.frontOrderSearch(no);
+//        if (node != null) {
+//            System.out.println("找到了节点：no=" + node.getNo() + "  name=" + node.getName());
+//        } else {
+//            System.out.println("没有找到no= " + no + " 的节点");
+//        }
+
+//         //中序遍历查找
+//        System.out.println("中序遍历查找：");
+//        int no = 5;
+//        System.out.println("正在查找编号为："+ no + " 的节点");
+//        HeroNode node = binaryTree.midOrderSearch(no);
+//        if (node != null) {
+//            System.out.println("找到了节点：no=" + node.getNo() + "  name=" + node.getName());
+//        } else {
+//            System.out.println("没有找到no= " + no + " 的节点");
+//        }
+
+        //后序遍历查找
+        System.out.println("中序遍历查找：");
+        int no = 3;
+        System.out.println("正在查找编号为："+ no + " 的节点");
+        HeroNode node = binaryTree.backOrderSearch(no);
+        if (node != null) {
+            System.out.println("找到了节点：no=" + node.getNo() + "  name=" + node.getName());
+        } else {
+            System.out.println("没有找到no= " + no + " 的节点");
+        }
+
+
+    }
+
+}
+
+
+//先创建HeroNode 节点
+class HeroNode {
+    private int no;
+    private String name;
+    private HeroNode left;  //默认null
+    private HeroNode right;  //默认null
+
+    public HeroNode(int no, String name) {
+        this.no = no;
+        this.name = name;
+    }
+
+    public int getNo() {
+        return no;
+    }
+
+    public void setNo(int no) {
+        this.no = no;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public HeroNode getLeft() {
+        return left;
+    }
+
+    public void setLeft(HeroNode left) {
+        this.left = left;
+    }
+
+    public HeroNode getRight() {
+        return right;
+    }
+
+    public void setRight(HeroNode right) {
+        this.right = right;
+    }
+
+    @Override
+    public String toString() {
+        return "no= " + no + ", name= " + name;
+    }
+
+    //编写前根序遍历的方法: 根 左 右
+    public void frontOrder() {
+        System.out.println(this); //先输出根节点（父节点）
+        //递归向左子树前根序遍历
+        if (this.left != null) {
+            this.left.frontOrder(); //递归
+        }
+        //递归向右子树前序遍历
+        if (this.right != null) {
+            this.right.frontOrder();//递归
+        }
+    }
+
+    //编写中根序遍历的方法: 左 根 右
+    public void midOrder() {
+        //递归向左子树中序遍历
+        if (this.left != null) {
+            this.left.midOrder();
+        }
+        //输出根节点
+        System.out.println(this);
+        //递归向右子树中序遍历
+        if (this.right != null) {
+            this.right.midOrder();
+        }
+    }
+
+    //编写后根序遍历的方法: 左 右 根
+    public void backOrder() {
+        //递归向左子树后序遍历
+        if (this.left != null) {
+            this.left.backOrder();
+        }
+        //递归向右子树后序遍历
+        if (this.right != null) {
+            this.right.backOrder();
+        }
+        //输出根节点
+        System.out.println(this);
+    }
+
+    //前序遍历查找
+
+    /**
+     * @param no 要查找的编号
+     * @return 如果找到就返回该Node, 如果没有找到返回null
+     */
+    public HeroNode frontOrderSearch(int no) {
+        //比较当前结点是不是
+        if (this.no == no) {
+            return this;
+        }
+        //如果不等，则判断当前节点的左子节点是否为空，如果不为空，则递归前序查找
+        //如果左递归前序查找找到了节点，就返回
+        HeroNode resNode = null;
+        if (this.left != null) {
+            resNode = this.left.frontOrderSearch(no);
+        }
+        if (resNode != null) { //说明左子树找到了
+            return resNode;
+        }
+        //如果左递归前序查找没有找到，
+        // 继续判断当前节点的右子节点是否为空，如果不为空则继续向右递归前序查找
+        if (this.right != null) {
+            resNode = this.right.frontOrderSearch(no);
+        }
+        return resNode;
+    }
+
+    //中序遍历查找
+    public HeroNode midOrderSearch(int no) {
+        //先判断当前节点的左子节点是否为空，如果不为空，则递归中序查找
+        HeroNode resNode = null;
+        if (this.left != null) {
+            resNode = this.left.midOrderSearch(no);
+        }
+        if (resNode != null) { //如果找到了，返回
+            return resNode;
+        }
+        //如果没有找到，就和当前节点比较，如果是则返回当前节点，
+        if (this.no == no) {
+            return this;
+        }
+        //否则继续进行右递归的中序查找
+        if (this.right != null) {
+            resNode = this.right.midOrderSearch(no);
+        }
+        return resNode;
+    }
+
+    //后序遍历查找
+    public HeroNode backOrderSearch(int no) {
+        //先判断当前节点的左子节点是否为空, 如果不为空，则向左递归后序查找
+        HeroNode resNode = null;
+        if (this.left != null) {
+            resNode = this.left.backOrderSearch(no);
+        }
+
+        //如果左边找到了
+        if (resNode != null) {
+            return resNode;
+        }
+        //如果左子树没有找到，则向右子树递归进行后序遍历查找
+        if (this.right != null) {
+            resNode = this.right.backOrderSearch(no);
+        }
+        if (resNode != null) {
+            return resNode;
+        }
+
+        //如果左右子树都没有找到，就比较当前节点是不是
+        if (this.no == no) {
+            return this;
+        }
+        return null;
+    }
+
+
+}
+
+//定义一个二叉树：BinaryTree
+class BinaryTree {
+    private HeroNode root; //根节点
+
+    public void setRoot(HeroNode root) {
+        this.root = root;
+    }
+
+    //前序遍历
+    public void frontOrder() {
+        if (this.root != null) {
+            this.root.frontOrder();
+        } else {
+            System.out.println("二叉树为空，无法前序遍历！");
+        }
+    }
+
+    //中序遍历
+    public void midOrder() {
+        if (this.root != null) {
+            this.root.midOrder();
+        } else {
+            System.out.println("二叉树为空，无法中序遍历！");
+        }
+    }
+
+    //后序遍历
+    public void backOrder() {
+        if (this.root != null) {
+            this.root.backOrder();
+        } else {
+            System.out.println("二叉树为空，无法后序遍历！");
+        }
+    }
+
+    //前序遍历查找
+    public HeroNode frontOrderSearch(int no) {
+        if (root != null) {
+            return root.frontOrderSearch(no);
+        } else return null;
+
+    }
+
+    //中序遍历查找
+    public HeroNode midOrderSearch(int no) {
+        if (root != null) {
+            return root.midOrderSearch(no);
+        } else return null;
+    }
+
+    //后序遍历查找
+    public HeroNode backOrderSearch(int no) {
+        if (root != null) {
+            return root.backOrderSearch(no);
+        } else return null;
+    }
+
+}
+~~~
+
+
+
+#### 二叉树 --- 删除节点 --- 简单版
+
+##### 规定：
+
+1. 如果删除的节点是叶子节点（没有子节点的节点），则删除该节点
+2. 如果删除的节点是非叶子节点（有子节点的节点），则删除该子树
+
+##### 完成删除节点的思路
+
+1. 如果整个树只有一个根节点（根节点root的left和right都是空)，则等价于将二叉树置空
+2. 因为二叉树是单向的，所以我们是判断**当前节点的子节点**是否需要删除，而不能去判断当前这个节点是不是需要删除的节点。(类似于单向链表的删除)
+3. 如果当前节点的左子节点不为空，并且左子节点就是需要删除的节点，就将this.left = null ，并且结束删除任务（结束递归）
+4. 如果当前节点的右子节点不为空，并且右子节点就是需要删除的节点，就将this.right = null，并且结束删除任务（结束递归）
+5. 如果第2，3步都没有删除掉这个节点，那么我们就需要向左子树进行递归删除
+6. 如果第4步也没有删除节点，则应当向右子树进行递归删除。
+
+
+
 ## 算法
 
 ### 递归算法
