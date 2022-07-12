@@ -2936,7 +2936,7 @@ class BinaryTree {
 
 
 
-#### 二叉树 --- 删除节点 --- 简单版
+#### 二叉树 --- 删除节点 --- 简化版  +  递归
 
 ##### 规定：
 
@@ -2951,6 +2951,335 @@ class BinaryTree {
 4. 如果当前节点的右子节点不为空，并且右子节点就是需要删除的节点，就将this.right = null，并且结束删除任务（结束递归）
 5. 如果第2，3步都没有删除掉这个节点，那么我们就需要向左子树进行递归删除
 6. 如果第4步也没有删除节点，则应当向右子树进行递归删除。
+
+##### 代码实现
+
+~~~java
+package tree;
+
+//二叉树
+public class BinaryTreeDemo {
+    public static void main(String[] args) {
+        //先需要创建一棵二叉树
+        BinaryTree binaryTree = new BinaryTree();
+        //创建需要的节点
+        HeroNode root = new HeroNode(1, "蕾姆");
+        HeroNode node2 = new HeroNode(2, "蒂法");
+        HeroNode node3 = new HeroNode(3, "爱丽丝");
+        HeroNode node4 = new HeroNode(4, "玛丽萝丝");
+        HeroNode node5 = new HeroNode(5, "雏鹤爱");
+
+        //说明：我们先手动创建该二叉树，后面学习以递归的方式创建二叉树
+        root.setLeft(node2);
+        root.setRight(node3);
+        node3.setRight(node4);
+        node3.setLeft(node5);
+        binaryTree.setRoot(root);
+
+
+        //测试：删除节点功能
+        System.out.println("删除前：前序遍历");
+        binaryTree.frontOrder();
+        binaryTree.delNode(3);
+        System.out.println("删除后：前序遍历");
+        binaryTree.frontOrder();
+    }
+}
+
+//先创建HeroNode 节点
+class HeroNode {
+    private int no;
+    private String name;
+    private HeroNode left;  //默认null
+    private HeroNode right;  //默认null
+
+    public HeroNode(int no, String name) {
+        this.no = no;
+        this.name = name;
+    }
+
+    public int getNo() {
+        return no;
+    }
+
+    public void setNo(int no) {
+        this.no = no;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public HeroNode getLeft() {
+        return left;
+    }
+
+    public void setLeft(HeroNode left) {
+        this.left = left;
+    }
+
+    public HeroNode getRight() {
+        return right;
+    }
+
+    public void setRight(HeroNode right) {
+        this.right = right;
+    }
+
+    @Override
+    public String toString() {
+        return "no= " + no + ", name= " + name;
+    }
+
+    //编写前根序遍历的方法: 根 左 右
+    public void frontOrder() {
+        System.out.println(this); //先输出根节点（父节点）
+        //递归向左子树前根序遍历
+        if (this.left != null) {
+            this.left.frontOrder(); //递归
+        }
+        //递归向右子树前序遍历
+        if (this.right != null) {
+            this.right.frontOrder();//递归
+        }
+    }
+
+    
+    //递归删除节点：
+    /*
+    规定：
+    1. 如果删除的节点是叶子节点（没有子节点的节点），则删除该节点
+    2. 如果删除的节点是非叶子节点（有子节点的节点），则删除该子树
+     */
+    public void delNode(int no){
+        /*
+        思路：
+        1. 如果整个树只有一个根节点（根节点root的left和right都是空)，则等价于将二叉树置空
+        2. 因为二叉树是单向的，所以我们是判断当前节点的子节点是否需要删除，而不能去判断当前这个节点是不是需要删除的节点。(类似于单向链表的删除)
+        3. 如果当前节点的左子节点不为空，并且左子节点就是需要删除的节点，就将this.left = null ，并且结束删除任务（结束递归）
+        4. 如果当前节点的右子节点不为空，并且右子节点就是需要删除的节点，就将this.right = null，并且结束删除任务（结束递归）
+        5. 如果第2，3步都没有删除掉这个节点，那么我们就需要向左子树进行递归删除
+        6. 如果第4步也没有删除节点，则应当向右子树进行递归删除。
+         */
+
+        //如果当前节点的左子节点不为空，并且左子节点就是需要删除的节点，就将this.left = null ，并且结束删除任务（结束递归）
+        if(this.left != null && this.left.no == no){
+            this.left = null;
+            return;
+        }
+        //如果当前节点的右子节点不为空，并且右子节点就是需要删除的节点，就将this.right = null，并且结束删除任务（结束递归）
+        if(this.right != null && this.right.no == no){
+            this.right = null;
+            return;
+        }
+        //如果第2，3步都没有删除掉这个节点，那么我们就需要向左子树进行递归删除
+        if(this.left != null){
+            this.left.delNode(no);
+        }
+        //如果第4步也没有删除节点，则应当向右子树进行递归删除
+        if(this.right != null){
+            this.right.delNode(no);
+        }
+    }
+
+
+}
+
+//定义一个二叉树：BinaryTree
+class BinaryTree {
+    private HeroNode root; //根节点
+
+    public void setRoot(HeroNode root) {
+        this.root = root;
+    }
+
+    //前序遍历
+    public void frontOrder() {
+        if (this.root != null) {
+            this.root.frontOrder();
+        } else {
+            System.out.println("二叉树为空，无法前序遍历！");
+        }
+    }
+
+    //删除节点
+    public void delNode(int no){
+        if(root != null){
+            //如果只有一个root节点，这里立即判断root是不是就是要删除的节点
+            if(root.getNo() == no){
+                root = null;
+            }
+            else{
+                //递归删除
+                root.delNode(no);
+            }
+        }
+        else{
+            System.out.println("空树，不能删除！");
+        }
+    }
+
+}
+~~~
+
+
+
+### 顺序存储二叉树（用数组存储二叉树）
+
+从基本存储来看，**数组存储方式**和**树的存储方式**可以相互转换，即：数组可以转换成树，树也可以转换成数组。
+
+![](http://124.222.43.240:2334/upload/2022-7-12$123562Dahs.jpg)
+
+**要求**：
+
+1. 上图的二叉树的节点，要求一数组的方式来存放 arr: [1,2,3,4,5,6,7]
+2. 要求在遍历数组 arr 时，仍然可以以前序遍历，中序遍历和后序遍历的方式完成节点的遍历
+
+
+
+#### 顺序存储二叉树的特点
+
+1. 顺序存储二叉树通常只考虑完全二叉树
+2. 整个树的根节点的下标n为0（放在数组下标为0的位置），也就是说，下标从0开始
+3. 下标为n的元素的左子节点的下标为$2*n + 1$
+4. 下标为n的元素的右子节点的下标为$2*n + 2$
+5. 下标为n的元素的父节点的下标为 $\frac{n-1}{2}$
+
+#### 顺序存储二叉树遍历
+
+##### 代码实现
+
+~~~java
+package tree;
+
+//用数组存储二叉树（顺序存储二叉树）
+public class ArrayBinaryTreeDemo {
+    public static void main(String[] args) {
+        int[] arr = {1,2,3,4,5,6,7};
+        //创建一个顺序存储二叉树
+        ArrayBinaryTree arrayBinaryTree = new ArrayBinaryTree(arr);
+        System.out.println("前序遍历");
+        arrayBinaryTree.frontOrder(); //1,2,4,5,3,6,7
+        System.out.println();
+        System.out.println("中序遍历");
+        arrayBinaryTree.midOrder();
+        System.out.println();
+        System.out.println("后序遍历");
+        arrayBinaryTree.backOrder();
+    }
+}
+
+//编写一个ArrayBinaryTree, 实现顺序存储二叉树遍历
+class ArrayBinaryTree {
+    private int[] arr; //存储数据节点的数组
+
+    public ArrayBinaryTree(int[] arr) {
+        this.arr = arr;
+    }
+
+    //重载
+    public void frontOrder(){
+        this.frontOrder(0);
+    }
+    public void midOrder(){
+        this.midOrder(0);
+    }
+    public void backOrder(){
+        this.backOrder(0);
+    }
+
+    //编写一个方法，完成顺序存储二叉树的前序遍历
+    /**
+     * @param index 数组的下标
+     */
+    public void frontOrder(int index){
+        //如果数组为空，或者 arr.length == 0
+        if(arr == null || arr.length == 0){
+            System.out.println("数组为空，不能进行顺序二叉树的前序遍历");
+            return;
+        }
+        //输出当前数组的元素
+        System.out.print(arr[index] + " ");
+        //向左递归遍历
+        if( (2 * index + 1)  < arr.length){
+            frontOrder(2 * index + 1);
+        }
+        //向右递归遍历
+        if(( 2 * index + 2) < arr.length){
+            frontOrder(2 * index + 2);
+        }
+    }
+
+    //中序遍历
+    public void midOrder(int index){
+        //如果数组为空，或者 arr.length == 0
+        if(arr == null || arr.length == 0){
+            System.out.println("数组为空，不能进行顺序二叉树的中序遍历");
+            return;
+        }
+        //向左递归遍历
+        if(( 2 * index + 1) < arr.length){
+            midOrder(2 * index + 1);
+        }
+        //输出当前数组的元素
+        System.out.print(arr[index] + " ");
+
+        //向右递归遍历
+        if( (2 * index + 2) < arr.length){
+            midOrder(2 * index + 2);
+        }
+    }
+
+    //后序遍历
+    public void backOrder(int index){
+        //如果数组为空，或者 arr.length == 0
+        if(arr == null || arr.length == 0){
+            System.out.println("数组为空，不能进行顺序二叉树的中序遍历");
+            return;
+        }
+        //向左递归遍历
+        if( (2 * index + 1) < arr.length){
+            backOrder(2 * index + 1);
+        }
+        //向右递归遍历
+        if( (2 * index + 2) < arr.length){
+            backOrder(2 * index + 2);
+        }
+        //输出当前数组的元素
+        System.out.print(arr[index] + " ");
+    }
+}
+~~~
+
+
+
+#### 顺序存储二叉树应用实例
+
+排序算法中的**堆排序**就会用到顺序存储二叉树，具体内容在后续。
+
+
+
+### 线索化二叉树
+
+例子：将数列 {1,3,6,8,10,14} 构建成一棵二叉树。
+
+![](http://124.222.43.240:2334/upload/2022-7-12$60601ih3py.png)
+
+
+
+#### 线索二叉树基本介绍
+
+1. n个节点的二叉链表中含有n+1 【推导过程：2n-(n-1) = n+1】个空指针域。利用二叉链表中的空指针域，存放指向该节点在<font color="red">**某种遍历次序**</font>下的**前驱**和**后继**节点的指针（这种附加的指针称为“线索”）。
+2. 这种加上了线索的二叉链表称为**线索链表**，相应的二叉树称为**线索二叉树**(Threaded Binary Tree)。 根据线索性质的不同，线索二叉树可分为**前序线索二叉树、中序线索二叉树**和**后序线索二叉树**三种。
+
+PS: 
+
+* 一个节点的前一个节点，称为**前驱**节点
+* 一个节点的后一个节点，称为**后继**节点
 
 
 
