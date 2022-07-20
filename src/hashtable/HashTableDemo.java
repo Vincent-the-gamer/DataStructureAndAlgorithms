@@ -114,7 +114,6 @@ class HashTable {
 }
 
 
-
 //雇员类
 class Emp{
     public int id;
